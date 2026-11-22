@@ -62,21 +62,28 @@ class _CtaButtonState extends State<CtaButton> {
                   color: (widget.primary ? AppColors.blue : AppColors.red).withValues(alpha: active ? 1 : .0),
                   offset: active ? const Offset(6, 6) : Offset.zero,
                 ),
-                if (widget.primary) BoxShadow(color: AppColors.red.withValues(alpha: active ? .55 : .3), blurRadius: active ? 34 : 20),
+                if (widget.primary)
+                  BoxShadow(
+                    color: AppColors.red.withValues(alpha: active ? .55 : .3),
+                    blurRadius: active ? 34 : 20,
+                  ),
                 if (_focus) const BoxShadow(color: Colors.white, spreadRadius: 2),
               ],
             ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(widget.label.toUpperCase(), style: AppText.label(widget.compact ? 12 : 13.5, color: fg)),
-              if (widget.icon != null) ...[
-                const SizedBox(width: 10),
-                AnimatedSlide(
-                  duration: const Duration(milliseconds: 220),
-                  offset: Offset(active ? .25 : 0, 0),
-                  child: Icon(widget.icon, size: 18, color: fg),
-                ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(widget.label.toUpperCase(), style: AppText.label(widget.compact ? 12 : 13.5, color: fg)),
+                if (widget.icon != null) ...[
+                  const SizedBox(width: 10),
+                  AnimatedSlide(
+                    duration: const Duration(milliseconds: 220),
+                    offset: Offset(active ? .25 : 0, 0),
+                    child: Icon(widget.icon, size: 18, color: fg),
+                  ),
+                ],
               ],
-            ]),
+            ),
           ),
         ),
       ),
@@ -99,38 +106,44 @@ class SectionHeader extends StatelessWidget {
     final align = center ? CrossAxisAlignment.center : CrossAxisAlignment.start;
     return Reveal(
       style: RevealStyle.swingLeft,
-      child: Column(crossAxisAlignment: align, children: [
-        Row(mainAxisSize: MainAxisSize.min, children: [
-          Transform.rotate(
-            angle: -.06,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-              decoration: BoxDecoration(
-                color: AppColors.red,
-                border: Border.all(color: Colors.black, width: 2),
-                boxShadow: const [BoxShadow(color: AppColors.blue, offset: Offset(3, 3))],
+      child: Column(
+        crossAxisAlignment: align,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Transform.rotate(
+                angle: -.06,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.red,
+                    border: Border.all(color: Colors.black, width: 2),
+                    boxShadow: const [BoxShadow(color: AppColors.blue, offset: Offset(3, 3))],
+                  ),
+                  child: Text(number, style: AppText.comic(18)),
+                ),
               ),
-              child: Text(number, style: AppText.comic(18)),
-            ),
+              const SizedBox(width: 14),
+              Text(eyebrow.toUpperCase(), style: AppText.label(12, color: AppColors.blueGlow)),
+            ],
           ),
-          const SizedBox(width: 14),
-          Text(eyebrow.toUpperCase(), style: AppText.label(12, color: AppColors.blueGlow)),
-        ]),
-        const SizedBox(height: 18),
-        ShaderMask(
-          shaderCallback: (r) => const LinearGradient(colors: [Colors.white, Color(0xFFDCE4FF)]).createShader(r),
-          child: Text(title, textAlign: center ? TextAlign.center : TextAlign.start, style: AppText.display(size)),
-        ),
-        const SizedBox(height: 14),
-        const _Swoosh(),
-        if (subtitle != null) ...[
           const SizedBox(height: 18),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 640),
-            child: Text(subtitle!, textAlign: center ? TextAlign.center : TextAlign.start, style: AppText.body(context.isMobile ? 15 : 17)),
+          ShaderMask(
+            shaderCallback: (r) => const LinearGradient(colors: [Colors.white, Color(0xFFDCE4FF)]).createShader(r),
+            child: Text(title, textAlign: center ? TextAlign.center : TextAlign.start, style: AppText.display(size)),
           ),
+          const SizedBox(height: 14),
+          const _Swoosh(),
+          if (subtitle != null) ...[
+            const SizedBox(height: 18),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Text(subtitle!, textAlign: center ? TextAlign.center : TextAlign.start, style: AppText.body(context.isMobile ? 15 : 17)),
+            ),
+          ],
         ],
-      ]),
+      ),
     );
   }
 }
@@ -180,13 +193,18 @@ class _SwooshPainter extends CustomPainter {
     canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(0, 2, w * .62, 5), const Radius.circular(3)), Paint()..color = AppColors.red);
     if (t > .3) {
       canvas.drawRRect(
-          RRect.fromRectAndRadius(Rect.fromLTWH(size.width * .66, 2, (w - size.width * .66).clamp(0, size.width * .34), 5), const Radius.circular(3)),
-          Paint()..color = AppColors.blue);
+        RRect.fromRectAndRadius(Rect.fromLTWH(size.width * .66, 2, (w - size.width * .66).clamp(0, size.width * .34), 5), const Radius.circular(3)),
+        Paint()..color = AppColors.blue,
+      );
     }
     // web thread under it
-    canvas.drawLine(Offset(0, 11), Offset(w, 11), Paint()
-      ..color = Colors.white.withValues(alpha: .18)
-      ..strokeWidth = 1);
+    canvas.drawLine(
+      Offset(0, 11),
+      Offset(w, 11),
+      Paint()
+        ..color = Colors.white.withValues(alpha: .18)
+        ..strokeWidth = 1,
+    );
   }
 
   @override
@@ -206,13 +224,17 @@ class SectionShell extends StatelessWidget {
     final scale = context.isMobile ? .6 : 1.0;
     return Container(
       color: background,
-      child: Stack(children: [
-        ...decor,
-        Padding(
-          padding: EdgeInsets.fromLTRB(context.gutter, top * scale, context.gutter, bottom * scale),
-          child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1240), child: child)),
-        ),
-      ]),
+      child: Stack(
+        children: [
+          ...decor,
+          Padding(
+            padding: EdgeInsets.fromLTRB(context.gutter, top * scale, context.gutter, bottom * scale),
+            child: Center(
+              child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1240), child: child),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -247,26 +269,36 @@ class _ComicPanelState extends State<ComicPanel> {
             side: BorderSide(color: _hover ? widget.accent : AppColors.border, width: 1.4),
           ),
           color: AppColors.surface,
-          shadows: [BoxShadow(color: other.withValues(alpha: _hover ? .9 : 0), offset: Offset(_hover ? 8 : 0, _hover ? 8 : 0))],
+          shadows: [
+            BoxShadow(
+              color: other.withValues(alpha: _hover ? .9 : 0),
+              offset: Offset(_hover ? 8 : 0, _hover ? 8 : 0),
+            ),
+          ],
         ),
         child: ClipPath(
           clipper: const ShapeBorderClipper(
-              shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(22), bottomLeft: Radius.circular(22)))),
-          child: Stack(children: [
-            if (widget.halftone)
-              Positioned(
-                right: 0,
-                top: 0,
-                width: 160,
-                height: 120,
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: _hover ? 1 : .35,
-                  child: CustomPaint(painter: HalftonePainter(color: widget.accent, fromTopLeft: false, opacity: .3, spacing: 11, maxDot: 2.2)),
+            shape: BeveledRectangleBorder(
+              borderRadius: BorderRadius.only(topRight: Radius.circular(22), bottomLeft: Radius.circular(22)),
+            ),
+          ),
+          child: Stack(
+            children: [
+              if (widget.halftone)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  width: 160,
+                  height: 120,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity: _hover ? 1 : .35,
+                    child: CustomPaint(painter: HalftonePainter(color: widget.accent, fromTopLeft: false, opacity: .3, spacing: 11, maxDot: 2.2)),
+                  ),
                 ),
-              ),
-            Padding(padding: widget.padding, child: widget.child),
-          ]),
+              Padding(padding: widget.padding, child: widget.child),
+            ],
+          ),
         ),
       ),
     );
@@ -304,53 +336,60 @@ class _TiltCardState extends State<TiltCard> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, c) {
-      final size = Size(c.maxWidth, c.maxHeight.isFinite ? c.maxHeight : 300);
-      return MouseRegion(
-        onEnter: (_) => _hover.forward(),
-        onExit: (_) {
-          _hover.reverse();
-          setState(() => _target = Offset.zero);
-        },
-        onHover: (e) => _move(e, context.size ?? size),
-        child: AnimatedBuilder(
-          animation: _hover,
-          builder: (context, child) {
-            final h = Curves.easeOut.transform(_hover.value);
-            final o = Offset.lerp(Offset.zero, _current, h)!;
-            final m = Matrix4.identity()
-              ..setEntry(3, 2, .0011)
-              ..rotateX(-o.dy * widget.maxTilt)
-              ..rotateY(o.dx * widget.maxTilt)
-              ..scaleByDouble(1 + .03 * h, 1 + .03 * h, 1, 1);
-            return Transform(
-              alignment: Alignment.center,
-              transform: m,
-              child: Stack(children: [
-                child!,
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(widget.borderRadius),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                            center: Alignment(o.dx, o.dy),
-                            radius: 1.1,
-                            colors: [Colors.white.withValues(alpha: .16 * h), Colors.transparent],
+    return LayoutBuilder(
+      builder: (context, c) {
+        final size = Size(c.maxWidth, c.maxHeight.isFinite ? c.maxHeight : 300);
+        return MouseRegion(
+          onEnter: (_) => _hover.forward(),
+          onExit: (_) {
+            _hover.reverse();
+            setState(() => _target = Offset.zero);
+          },
+          onHover: (e) => _move(e, context.size ?? size),
+          child: AnimatedBuilder(
+            animation: _hover,
+            builder: (context, child) {
+              final h = Curves.easeOut.transform(_hover.value);
+              final o = Offset.lerp(Offset.zero, _current, h)!;
+              final m = Matrix4.identity()
+                ..setEntry(3, 2, .0011)
+                ..rotateX(-o.dy * widget.maxTilt)
+                ..rotateY(o.dx * widget.maxTilt)
+                ..scaleByDouble(1 + .03 * h, 1 + .03 * h, 1, 1);
+              return Transform(
+                alignment: Alignment.center,
+                transform: m,
+                child: Stack(
+                  children: [
+                    child!,
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(widget.borderRadius),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: RadialGradient(
+                                center: Alignment(o.dx, o.dy),
+                                radius: 1.1,
+                                colors: [
+                                  Colors.white.withValues(alpha: .16 * h),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ]),
-            );
-          },
-          child: widget.child,
-        ),
-      );
-    });
+              );
+            },
+            child: widget.child,
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -427,14 +466,17 @@ class Tag extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: .1),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: color.withValues(alpha: .35)),
-        ),
-        child: Text(text, style: AppText.body(12, color: color, weight: FontWeight.w700, height: 1.2)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: .1),
+      borderRadius: BorderRadius.circular(30),
+      border: Border.all(color: color.withValues(alpha: .35)),
+    ),
+    child: Text(
+      text,
+      style: AppText.body(12, color: color, weight: FontWeight.w700, height: 1.2),
+    ),
+  );
 }
 
 /// Gradient icon badge
@@ -445,19 +487,19 @@ class IconBadge extends StatelessWidget {
   final bool redFirst;
   @override
   Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size * .28),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: redFirst ? const [AppColors.red, AppColors.blue] : const [AppColors.blue, AppColors.red],
-          ),
-          boxShadow: [BoxShadow(color: (redFirst ? AppColors.red : AppColors.blue).withValues(alpha: .35), blurRadius: 18, offset: const Offset(0, 6))],
-        ),
-        child: Icon(icon, color: Colors.white, size: size * .5),
-      );
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size * .28),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: redFirst ? const [AppColors.red, AppColors.blue] : const [AppColors.blue, AppColors.red],
+      ),
+      boxShadow: [BoxShadow(color: (redFirst ? AppColors.red : AppColors.blue).withValues(alpha: .35), blurRadius: 18, offset: const Offset(0, 6))],
+    ),
+    child: Icon(icon, color: Colors.white, size: size * .5),
+  );
 }
 
 /// Responsive grid that wraps children into equal-width columns.
@@ -470,14 +512,16 @@ class ResponsiveGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, c) {
-      final cols = math.max(1, math.min(maxColumns, ((c.maxWidth + spacing) / (minItemWidth + spacing)).floor()));
-      final w = (c.maxWidth - spacing * (cols - 1)) / cols;
-      return Wrap(
-        spacing: spacing,
-        runSpacing: spacing,
-        children: [for (final ch in children) SizedBox(width: w, child: ch)],
-      );
-    });
+    return LayoutBuilder(
+      builder: (context, c) {
+        final cols = math.max(1, math.min(maxColumns, ((c.maxWidth + spacing) / (minItemWidth + spacing)).floor()));
+        final w = (c.maxWidth - spacing * (cols - 1)) / cols;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [for (final ch in children) SizedBox(width: w, child: ch)],
+        );
+      },
+    );
   }
 }

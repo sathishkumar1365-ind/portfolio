@@ -16,10 +16,25 @@ class ServiceMarquee extends StatelessWidget {
     return SizedBox(
       height: h,
       child: ClipRect(
-        child: Stack(alignment: Alignment.center, children: [
-          Transform.rotate(angle: .035, child: OverflowBox(maxWidth: double.infinity, child: _Band(words: _b, color: AppColors.blue, speed: -40, textColor: Colors.white))),
-          Transform.rotate(angle: -.03, child: OverflowBox(maxWidth: double.infinity, child: _Band(words: _a, color: AppColors.red, speed: 55, textColor: Colors.white))),
-        ]),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Transform.rotate(
+              angle: .035,
+              child: OverflowBox(
+                maxWidth: double.infinity,
+                child: _Band(words: _b, color: AppColors.blue, speed: -40, textColor: Colors.white),
+              ),
+            ),
+            Transform.rotate(
+              angle: -.03,
+              child: OverflowBox(
+                maxWidth: double.infinity,
+                child: _Band(words: _a, color: AppColors.red, speed: 55, textColor: Colors.white),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -47,8 +62,7 @@ class _BandState extends State<_Band> with SingleTickerProviderStateMixin {
       final dt = (elapsed - _last).inMicroseconds / 1e6;
       _last = elapsed;
       _offset.value += widget.speed * dt;
-    })
-      ..start();
+    })..start();
   }
 
   @override
@@ -60,15 +74,18 @@ class _BandState extends State<_Band> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final fs = context.isMobile ? 26.0 : 34.0;
-    final row = Row(mainAxisSize: MainAxisSize.min, children: [
-      for (final w in widget.words) ...[
-        Text(w, style: AppText.comic(fs, color: widget.textColor)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: Icon(Icons.blur_on_rounded, color: Colors.white.withValues(alpha: .7), size: fs * .8),
-        ),
+    final row = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final w in widget.words) ...[
+          Text(w, style: AppText.comic(fs, color: widget.textColor)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: Icon(Icons.blur_on_rounded, color: Colors.white.withValues(alpha: .7), size: fs * .8),
+          ),
+        ],
       ],
-    ]);
+    );
     return Container(
       width: MediaQuery.sizeOf(context).width * 1.2,
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -79,9 +96,11 @@ class _BandState extends State<_Band> with SingleTickerProviderStateMixin {
       ),
       child: ExcludeSemantics(
         child: RepaintBoundary(
-          child: LayoutBuilder(builder: (context, c) {
-            return _Looper(offset: _offset, child: row);
-          }),
+          child: LayoutBuilder(
+            builder: (context, c) {
+              return _Looper(offset: _offset, child: row);
+            },
+          ),
         ),
       ),
     );
@@ -121,12 +140,15 @@ class _LooperState extends State<_Looper> {
           maxWidth: double.infinity,
           child: Transform.translate(
             offset: Offset(x, 0),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              KeyedSubtree(key: _key, child: widget.child),
-              widget.child,
-              widget.child,
-              widget.child,
-            ]),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                KeyedSubtree(key: _key, child: widget.child),
+                widget.child,
+                widget.child,
+                widget.child,
+              ],
+            ),
           ),
         );
       },

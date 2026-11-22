@@ -8,8 +8,7 @@ class ScrollScope extends InheritedWidget {
   const ScrollScope({super.key, required this.controller, required super.child});
   final ScrollController controller;
 
-  static ScrollController? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<ScrollScope>()?.controller;
+  static ScrollController? of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<ScrollScope>()?.controller;
 
   @override
   bool updateShouldNotify(ScrollScope oldWidget) => oldWidget.controller != controller;
@@ -20,13 +19,7 @@ enum RevealStyle { rise, swingLeft, swingRight, zoom, slideLeft, slideRight }
 /// Animates its child in once it scrolls into view. Swing styles pivot from the
 /// top edge, like something swinging in on a line.
 class Reveal extends StatefulWidget {
-  const Reveal({
-    super.key,
-    required this.child,
-    this.style = RevealStyle.rise,
-    this.delay = Duration.zero,
-    this.duration = const Duration(milliseconds: 850),
-  });
+  const Reveal({super.key, required this.child, this.style = RevealStyle.rise, this.delay = Duration.zero, this.duration = const Duration(milliseconds: 850)});
   final Widget child;
   final RevealStyle style;
   final Duration delay;
