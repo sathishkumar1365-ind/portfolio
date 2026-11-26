@@ -42,18 +42,16 @@ class _IntroSlotState extends State<IntroSlot> {
   Widget build(BuildContext context) {
     final site = widget.builder(context, _done);
     if (widget.intro == null || _removeIntro) return site;
-    return Stack(children: [
-      site,
-      Positioned.fill(
-        child: IgnorePointer(
-          ignoring: _done,
-          child: AnimatedOpacity(
-            opacity: _done ? 0 : 1,
-            duration: const Duration(milliseconds: 650),
-            child: widget.intro!(context, _finish),
+    return Stack(
+      children: [
+        site,
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: _done,
+            child: AnimatedOpacity(opacity: _done ? 0 : 1, duration: const Duration(milliseconds: 650), child: widget.intro!(context, _finish)),
           ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 }

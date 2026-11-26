@@ -53,10 +53,7 @@ class WebPainter extends CustomPainter {
       final end = center + Offset(math.cos(a), math.sin(a)) * maxR * Curves.easeOutCubic.transform(spokeT);
       paint
         ..strokeWidth = 1.1
-        ..shader = ui.Gradient.linear(center, end, [
-          color.withValues(alpha: opacity * 1.6),
-          color.withValues(alpha: 0),
-        ]);
+        ..shader = ui.Gradient.linear(center, end, [color.withValues(alpha: opacity * 1.6), color.withValues(alpha: 0)]);
       canvas.drawLine(center, end, paint);
     }
     paint.shader = null;
@@ -89,8 +86,7 @@ class WebPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(WebPainter old) =>
-      old.progress != progress || old.sway != sway || old.parallax != parallax || old.color != color;
+  bool shouldRepaint(WebPainter old) => old.progress != progress || old.sway != sway || old.parallax != parallax || old.color != color;
 }
 
 /// Comic halftone dots that fade along a diagonal.
@@ -142,12 +138,13 @@ class StrandPainter extends CustomPainter {
     final metric = path.computeMetrics().first;
     final drawn = metric.extractPath(0, metric.length * t.clamp(0, 1));
     canvas.drawPath(
-        drawn,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = width
-          ..strokeCap = StrokeCap.round
-          ..color = color.withValues(alpha: .55));
+      drawn,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = width
+        ..strokeCap = StrokeCap.round
+        ..color = color.withValues(alpha: .55),
+    );
     final tip = metric.getTangentForOffset(metric.length * t.clamp(0, 1))?.position;
     if (tip != null && t < 1) {
       canvas.drawCircle(tip, 3, Paint()..color = AppColors.red);

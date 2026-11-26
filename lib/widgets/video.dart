@@ -1,9 +1,12 @@
+import 'dart:math' as math;
 import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:video_player/video_player.dart';
 
+import '../content/site_content.dart';
 import '../theme/app_theme.dart';
+import 'embed.dart';
 import 'web_painters.dart';
 
 /// Opens a full-screen lightbox that streams [url]. Nothing loads until opened.
@@ -14,7 +17,7 @@ Future<void> openVideo(BuildContext context, {required String url, required Stri
     barrierLabel: 'Close video',
     barrierColor: Colors.black.withValues(alpha: .88),
     transitionDuration: const Duration(milliseconds: 420),
-    pageBuilder: (_, _, _) => _VideoLightbox(url: url, title: title),
+    pageBuilder: (_, _, _) => youTubeId(url) != null ? _YouTubeLightbox(id: youTubeId(url)!, title: title) : _VideoLightbox(url: url, title: title),
     transitionBuilder: (_, a, _, child) {
       final t = Curves.easeOutBack.transform(a.value);
       return Opacity(
@@ -23,6 +26,56 @@ Future<void> openVideo(BuildContext context, {required String url, required Stri
       );
     },
   );
+}
+
+class _YouTubeLightbox extends StatelessWidget {
+  const _YouTubeLightbox({required this.id, required this.title});
+  final String id, title;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final h = math.min(size.height * .8, 760.0);
+    final w = math.min(h * 9 / 16, size.width * .92);
+    return Center(
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: math.max(w, 280),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(title, style: AppText.display(22), overflow: TextOverflow.ellipsis),
+                  ),
+                  IconButton(
+                    tooltip: 'Close',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white, size: 30),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: w,
+              height: w * 16 / 9,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.red, width: 2),
+                boxShadow: const [BoxShadow(color: AppColors.blue, offset: Offset(8, 8))],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: youTubePlayer(id),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _VideoLightbox extends StatefulWidget {
@@ -39,13 +92,16 @@ class _VideoLightboxState extends State<_VideoLightbox> {
   @override
   void initState() {
     super.initState();
-    _c.initialize().then((_) {
-      if (!mounted) return;
-      setState(() {});
-      _c.play();
-    }).catchError((_) {
-      if (mounted) setState(() => _error = true);
-    });
+    _c
+        .initialize()
+        .then((_) {
+          if (!mounted) return;
+          setState(() {});
+          _c.play();
+        })
+        .catchError((_) {
+          if (mounted) setState(() => _error = true);
+        });
     _c.addListener(() {
       if (mounted) setState(() {});
     });
@@ -72,36 +128,47 @@ class _VideoLightboxState extends State<_VideoLightbox> {
     return Center(
       child: Material(
         type: MaterialType.transparency,
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(
-            width: w,
-            child: Row(children: [
-              Expanded(child: Text(widget.title, style: AppText.display(context.isMobile ? 20 : 26), overflow: TextOverflow.ellipsis)),
-              IconButton(
-                tooltip: 'Close',
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close_rounded, color: Colors.white, size: 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: w,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(widget.title, style: AppText.display(context.isMobile ? 20 : 26), overflow: TextOverflow.ellipsis),
+                  ),
+                  IconButton(
+                    tooltip: 'Close',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white, size: 30),
+                  ),
+                ],
               ),
-            ]),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            width: w,
-            height: h,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.red, width: 2),
-              boxShadow: const [BoxShadow(color: AppColors.blue, offset: Offset(8, 8)), BoxShadow(color: Color(0x88E8202A), blurRadius: 60)],
             ),
-            clipBehavior: Clip.antiAlias,
-            child: _error
-                ? Center(child: Text('This video could not be loaded.', style: AppText.body(15)))
-                : !ready
-                    ? const Center(child: _WebSpinner())
-                    : GestureDetector(
-                        onTap: () => _c.value.isPlaying ? _c.pause() : _c.play(),
-                        child: Stack(fit: StackFit.expand, children: [
+            const SizedBox(height: 10),
+            Container(
+              width: w,
+              height: h,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.red, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: AppColors.blue, offset: Offset(8, 8)),
+                  BoxShadow(color: Color(0x88E8202A), blurRadius: 60),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: _error
+                  ? Center(child: Text('This video could not be loaded.', style: AppText.body(15)))
+                  : !ready
+                  ? const Center(child: _WebSpinner())
+                  : GestureDetector(
+                      onTap: () => _c.value.isPlaying ? _c.pause() : _c.play(),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
                           VideoPlayer(_c),
                           AnimatedOpacity(
                             duration: const Duration(milliseconds: 200),
@@ -120,28 +187,32 @@ class _VideoLightboxState extends State<_VideoLightbox> {
                               colors: const VideoProgressColors(playedColor: AppColors.red, bufferedColor: Color(0x552563FF), backgroundColor: Colors.white12),
                             ),
                           ),
-                        ]),
+                        ],
                       ),
-          ),
-          if (ready)
-            SizedBox(
-              width: w,
-              child: Row(children: [
-                IconButton(
-                  tooltip: _c.value.isPlaying ? 'Pause' : 'Play',
-                  onPressed: () => _c.value.isPlaying ? _c.pause() : _c.play(),
-                  icon: Icon(_c.value.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, color: Colors.white),
-                ),
-                IconButton(
-                  tooltip: _c.value.volume == 0 ? 'Unmute' : 'Mute',
-                  onPressed: () => _c.setVolume(_c.value.volume == 0 ? 1 : 0),
-                  icon: Icon(_c.value.volume == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded, color: Colors.white),
-                ),
-                const Spacer(),
-                Text('${_fmt(_c.value.position)} / ${_fmt(_c.value.duration)}', style: AppText.body(13)),
-              ]),
+                    ),
             ),
-        ]),
+            if (ready)
+              SizedBox(
+                width: w,
+                child: Row(
+                  children: [
+                    IconButton(
+                      tooltip: _c.value.isPlaying ? 'Pause' : 'Play',
+                      onPressed: () => _c.value.isPlaying ? _c.pause() : _c.play(),
+                      icon: Icon(_c.value.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, color: Colors.white),
+                    ),
+                    IconButton(
+                      tooltip: _c.value.volume == 0 ? 'Unmute' : 'Mute',
+                      onPressed: () => _c.setVolume(_c.value.volume == 0 ? 1 : 0),
+                      icon: Icon(_c.value.volume == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded, color: Colors.white),
+                    ),
+                    const Spacer(),
+                    Text('${_fmt(_c.value.position)} / ${_fmt(_c.value.duration)}', style: AppText.body(13)),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -165,16 +236,26 @@ class _WebSpinnerState extends State<_WebSpinner> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 90,
-        height: 90,
-        child: AnimatedBuilder(
-          animation: _c,
-          builder: (_, _) => Transform.rotate(
-            angle: _c.value * 6.283,
-            child: CustomPaint(painter: WebPainter(progress: (_c.value * 2).clamp(0, 1), sway: _c.value, anchor: const Offset(.5, .5), opacity: .6, spokes: 8, rings: 4, radiusFactor: .5)),
+    width: 90,
+    height: 90,
+    child: AnimatedBuilder(
+      animation: _c,
+      builder: (_, _) => Transform.rotate(
+        angle: _c.value * 6.283,
+        child: CustomPaint(
+          painter: WebPainter(
+            progress: (_c.value * 2).clamp(0, 1),
+            sway: _c.value,
+            anchor: const Offset(.5, .5),
+            opacity: .6,
+            spokes: 8,
+            rings: 4,
+            radiusFactor: .5,
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 /// Muted inline preview that only loads while [active] is true (hover on desktop).
@@ -204,6 +285,7 @@ class _HoverPreviewState extends State<HoverPreview> {
   }
 
   Future<void> _start() async {
+    if (youTubeId(widget.url) != null) return; // no inline previews for embeds
     final c = VideoPlayerController.networkUrl(Uri.parse(widget.url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
     _c = c;
     try {
@@ -263,30 +345,29 @@ class Poster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final redFirst = seed.isEven;
-    return Stack(fit: StackFit.expand, children: [
-      DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment(-1 + (seed % 3) * .3, -1),
-            end: const Alignment(1, 1),
-            colors: redFirst
-                ? const [Color(0xFF3A0A12), Color(0xFF0D0F1E), Color(0xFF0A1A4A)]
-                : const [Color(0xFF0A1A4A), Color(0xFF0D0F1E), Color(0xFF3A0A12)],
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(-1 + (seed % 3) * .3, -1),
+                end: const Alignment(1, 1),
+                colors: redFirst
+                    ? const [Color(0xFF3A0A12), Color(0xFF0D0F1E), Color(0xFF0A1A4A)]
+                    : const [Color(0xFF0A1A4A), Color(0xFF0D0F1E), Color(0xFF3A0A12)],
+              ),
+            ),
           ),
-        ),
+          CustomPaint(painter: HalftonePainter(color: redFirst ? AppColors.red : AppColors.blue, spacing: 12, maxDot: 2.4, opacity: .4)),
+          CustomPaint(
+            painter: WebPainter(progress: 1, sway: seed * .13, anchor: Offset(seed.isEven ? 1 : 0, 0), opacity: .16, spokes: 10, rings: 6, radiusFactor: .8),
+          ),
+          Center(child: Icon(icon, size: 64, color: Colors.white.withValues(alpha: .12))),
+        ],
       ),
-      CustomPaint(painter: HalftonePainter(color: redFirst ? AppColors.red : AppColors.blue, spacing: 12, maxDot: 2.4, opacity: .4)),
-      CustomPaint(
-          painter: WebPainter(
-              progress: 1,
-              sway: seed * .13,
-              anchor: Offset(seed.isEven ? 1 : 0, 0),
-              opacity: .16,
-              spokes: 10,
-              rings: 6,
-              radiusFactor: .8)),
-      Center(child: Icon(icon, size: 64, color: Colors.white.withValues(alpha: .12))),
-    ]);
+    );
   }
 }
 
@@ -315,21 +396,26 @@ class _PlayBadgeState extends State<PlayBadge> with SingleTickerProviderStateMix
       height: s * 1.8,
       child: AnimatedBuilder(
         animation: _c,
-        builder: (_, child) => Stack(alignment: Alignment.center, children: [
-          for (final off in [0.0, .5])
-            Builder(builder: (_) {
-              final v = (_c.value + off) % 1;
-              return Container(
-                width: s * (1 + v * .8),
-                height: s * (1 + v * .8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: (off == 0 ? AppColors.red : AppColors.blue).withValues(alpha: (1 - v) * .7), width: 2),
-                ),
-              );
-            }),
-          child!,
-        ]),
+        builder: (_, child) => Stack(
+          alignment: Alignment.center,
+          children: [
+            for (final off in [0.0, .5])
+              Builder(
+                builder: (_) {
+                  final v = (_c.value + off) % 1;
+                  return Container(
+                    width: s * (1 + v * .8),
+                    height: s * (1 + v * .8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: (off == 0 ? AppColors.red : AppColors.blue).withValues(alpha: (1 - v) * .7), width: 2),
+                    ),
+                  );
+                },
+              ),
+            child!,
+          ],
+        ),
         child: AnimatedScale(
           duration: const Duration(milliseconds: 250),
           scale: widget.hot ? 1.12 : 1,
@@ -340,7 +426,10 @@ class _PlayBadgeState extends State<PlayBadge> with SingleTickerProviderStateMix
               shape: BoxShape.circle,
               color: AppColors.red,
               border: Border.all(color: Colors.white, width: 2.5),
-              boxShadow: const [BoxShadow(color: AppColors.blue, offset: Offset(4, 4)), BoxShadow(color: Color(0x99E8202A), blurRadius: 30)],
+              boxShadow: const [
+                BoxShadow(color: AppColors.blue, offset: Offset(4, 4)),
+                BoxShadow(color: Color(0x99E8202A), blurRadius: 30),
+              ],
             ),
             child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: s * .6),
           ),

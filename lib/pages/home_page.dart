@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -86,7 +84,10 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Widget _anchor(Sec s, Widget child) => KeyedSubtree(key: _keys[s], child: child);
+  Widget _anchor(Sec s, Widget child) => KeyedSubtree(
+    key: _keys[s],
+    child: OnScreen(child: child),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -96,32 +97,36 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColors.bg,
         body: ScrollScope(
           controller: _scroll,
-          child: Stack(children: [
-            Scrollbar(
-              controller: _scroll,
-              child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Scrollbar(
                 controller: _scroll,
-                child: Column(children: [
-                  _anchor(Sec.home, HeroSection(start: widget.introDone)),
-                  const ServiceMarquee(),
-                  _anchor(Sec.work, const Column(children: [ShowreelSection(), PortfolioSection(), CaseStudiesSection()])),
-                  const SlashDivider(from: AppColors.bg, to: AppColors.bgAlt),
-                  _anchor(Sec.services, const ServicesSection()),
-                  const SlashDivider(flip: true, from: AppColors.bgAlt, to: AppColors.bg),
-                  _anchor(Sec.about, const Column(children: [AboutSection(), WhyChooseSection(), IndustriesSection()])),
-                  const SlashDivider(from: AppColors.bg, to: AppColors.bgAlt),
-                  _anchor(Sec.process, const Column(children: [WorkflowSection(), SoftwareSection(), ExpectSection()])),
-                  const SlashDivider(flip: true, from: AppColors.bgAlt, to: AppColors.bg),
-                  _anchor(Sec.pricing, const PricingSection()),
-                  _anchor(Sec.faq, const FaqSection()),
-                  _anchor(Sec.contact, const ContactSection()),
-                  const FooterSection(),
-                ]),
+                child: SingleChildScrollView(
+                  controller: _scroll,
+                  child: Column(
+                    children: [
+                      _anchor(Sec.home, HeroSection(start: widget.introDone)),
+                      const OnScreen(child: ServiceMarquee()),
+                      _anchor(Sec.work, const Column(children: [ShowreelSection(), PortfolioSection(), CaseStudiesSection()])),
+                      const SlashDivider(from: AppColors.bg, to: AppColors.bgAlt),
+                      _anchor(Sec.services, const ServicesSection()),
+                      const SlashDivider(flip: true, from: AppColors.bgAlt, to: AppColors.bg),
+                      _anchor(Sec.about, const Column(children: [AboutSection(), WhyChooseSection(), IndustriesSection()])),
+                      const SlashDivider(from: AppColors.bg, to: AppColors.bgAlt),
+                      _anchor(Sec.process, const Column(children: [WorkflowSection(), SoftwareSection(), ExpectSection()])),
+                      const SlashDivider(flip: true, from: AppColors.bgAlt, to: AppColors.bg),
+                      _anchor(Sec.pricing, const PricingSection()),
+                      _anchor(Sec.faq, const FaqSection()),
+                      _anchor(Sec.contact, const ContactSection()),
+                      const OnScreen(child: FooterSection()),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            _NavBar(scrolled: _scrolled, active: _active, progress: _progress, onGo: _go),
-            const Positioned(right: 20, bottom: 20, child: _WhatsAppFab()),
-          ]),
+              _NavBar(scrolled: _scrolled, active: _active, progress: _progress, onGo: _go),
+              const Positioned(right: 20, bottom: 20, child: _WhatsAppFab()),
+            ],
+          ),
         ),
       ),
     );
@@ -144,47 +149,52 @@ class _NavBar extends StatelessWidget {
       right: 0,
       child: ValueListenableBuilder<bool>(
         valueListenable: scrolled,
-        builder: (context, isScrolled, _) => ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: isScrolled ? 14 : 0, sigmaY: isScrolled ? 14 : 0),
+        builder: (context, isScrolled, _) => RepaintBoundary(
+          // A live backdrop blur re-renders the page under the bar every scroll frame; a solid bar is much cheaper.
+          child: KeyedSubtree(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              color: isScrolled ? AppColors.bg.withValues(alpha: .78) : Colors.transparent,
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                AnimatedPadding(
-                  duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.symmetric(horizontal: context.gutter, vertical: isScrolled ? 12 : 22),
-                  child: Row(children: [
-                    _Logo(onTap: () => onGo(Sec.home)),
-                    const Spacer(),
-                    if (desktop) ...[
-                      ValueListenableBuilder<Sec>(
-                        valueListenable: active,
-                        builder: (_, a, _) => Row(children: [
-                          for (final (s, label) in _navItems) _NavLink(label: label, active: a == s, onTap: () => onGo(s)),
-                        ]),
-                      ),
-                      const SizedBox(width: 18),
-                      CtaButton(label: "Let's Work Together", compact: true, onTap: () => onGo(Sec.contact)),
-                    ] else
-                      IconButton(
-                        tooltip: 'Menu',
-                        onPressed: () => _openMenu(context),
-                        icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 30),
-                      ),
-                  ]),
-                ),
-                ValueListenableBuilder<double>(
-                  valueListenable: progress,
-                  builder: (_, p, _) => Align(
-                    alignment: Alignment.centerLeft,
-                    child: FractionallySizedBox(
-                      widthFactor: p,
-                      child: Container(height: 2.5, decoration: const BoxDecoration(gradient: AppColors.heroGradient)),
+              color: isScrolled ? AppColors.bg.withValues(alpha: .94) : Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedPadding(
+                    duration: const Duration(milliseconds: 300),
+                    padding: EdgeInsets.symmetric(horizontal: context.gutter, vertical: isScrolled ? 12 : 22),
+                    child: Row(
+                      children: [
+                        _Logo(onTap: () => onGo(Sec.home)),
+                        const Spacer(),
+                        if (desktop) ...[
+                          ValueListenableBuilder<Sec>(
+                            valueListenable: active,
+                            builder: (_, a, _) => Row(
+                              children: [for (final (s, label) in _navItems) _NavLink(label: label, active: a == s, onTap: () => onGo(s))],
+                            ),
+                          ),
+                          const SizedBox(width: 18),
+                          CtaButton(label: "Let's Work Together", compact: true, onTap: () => onGo(Sec.contact)),
+                        ] else
+                          IconButton(
+                            tooltip: 'Menu',
+                            onPressed: () => _openMenu(context),
+                            icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 30),
+                          ),
+                      ],
                     ),
                   ),
-                ),
-              ]),
+                  ValueListenableBuilder<double>(
+                    valueListenable: progress,
+                    builder: (_, p, _) => Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: p,
+                        child: Container(height: 2.5, decoration: const BoxDecoration(gradient: AppColors.heroGradient)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -199,10 +209,13 @@ class _NavBar extends StatelessWidget {
       barrierDismissible: true,
       barrierColor: Colors.transparent,
       transitionDuration: const Duration(milliseconds: 500),
-      pageBuilder: (ctx, a, _) => _MobileMenu(anim: a, onGo: (s) {
-        Navigator.of(ctx).pop();
-        Future.delayed(const Duration(milliseconds: 250), () => onGo(s));
-      }),
+      pageBuilder: (ctx, a, _) => _MobileMenu(
+        anim: a,
+        onGo: (s) {
+          Navigator.of(ctx).pop();
+          Future.delayed(const Duration(milliseconds: 250), () => onGo(s));
+        },
+      ),
     );
   }
 }
@@ -224,54 +237,65 @@ class _MobileMenu extends StatelessWidget {
             clipper: _CircleReveal(t),
             child: Container(
               color: AppColors.bg,
-              child: Stack(children: [
-                Positioned.fill(child: CustomPaint(painter: _MenuBg())),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(children: [
-                        _Logo(onTap: () => onGo(Sec.home)),
-                        const Spacer(),
-                        IconButton(
-                          tooltip: 'Close menu',
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(Icons.close_rounded, color: Colors.white, size: 32),
-                        ),
-                      ]),
-                      const SizedBox(height: 30),
-                      for (var i = 0; i < _navItems.length; i++)
-                        Builder(builder: (_) {
-                          final local = ((anim.value - i * .06) / .6).clamp(0.0, 1.0);
-                          final e = Curves.easeOutBack.transform(local);
-                          return Opacity(
-                            opacity: local,
-                            child: Transform.translate(
-                              offset: Offset(-60 * (1 - e), 0),
-                              child: Transform.rotate(
-                                angle: -.08 * (1 - e),
-                                alignment: Alignment.topLeft,
-                                child: InkWell(
-                                  onTap: () => onGo(_navItems[i].$1),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                    child: Row(children: [
-                                      Text('0${i + 1}', style: AppText.comic(18, color: i.isEven ? AppColors.red : AppColors.blueGlow)),
-                                      const SizedBox(width: 16),
-                                      Text(_navItems[i].$2.toUpperCase(), style: AppText.display(40)),
-                                    ]),
-                                  ),
-                                ),
+              child: Stack(
+                children: [
+                  Positioned.fill(child: CustomPaint(painter: _MenuBg())),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              _Logo(onTap: () => onGo(Sec.home)),
+                              const Spacer(),
+                              IconButton(
+                                tooltip: 'Close menu',
+                                onPressed: () => Navigator.of(context).pop(),
+                                icon: const Icon(Icons.close_rounded, color: Colors.white, size: 32),
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          for (var i = 0; i < _navItems.length; i++)
+                            Builder(
+                              builder: (_) {
+                                final local = ((anim.value - i * .06) / .6).clamp(0.0, 1.0);
+                                final e = Curves.easeOutBack.transform(local);
+                                return Opacity(
+                                  opacity: local,
+                                  child: Transform.translate(
+                                    offset: Offset(-60 * (1 - e), 0),
+                                    child: Transform.rotate(
+                                      angle: -.08 * (1 - e),
+                                      alignment: Alignment.topLeft,
+                                      child: InkWell(
+                                        onTap: () => onGo(_navItems[i].$1),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 8),
+                                          child: Row(
+                                            children: [
+                                              Text('0${i + 1}', style: AppText.comic(18, color: i.isEven ? AppColors.red : AppColors.blueGlow)),
+                                              const SizedBox(width: 16),
+                                              Text(_navItems[i].$2.toUpperCase(), style: AppText.display(40)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        }),
-                      const Spacer(),
-                      CtaButton(label: "Let's Work Together", icon: Icons.arrow_forward_rounded, onTap: () => onGo(Sec.contact)),
-                    ]),
+                          const Spacer(),
+                          CtaButton(label: "Let's Work Together", icon: Icons.arrow_forward_rounded, onTap: () => onGo(Sec.contact)),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ),
           ),
         );
@@ -326,27 +350,33 @@ class _LogoState extends State<_Logo> {
         child: Semantics(
           label: 'Nikhil Cutz home',
           button: true,
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            AnimatedRotation(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOutBack,
-              turns: _h ? .125 : 0,
-              child: Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [AppColors.red, AppColors.blue], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(9),
-                  border: Border.all(color: Colors.white24),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedRotation(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutBack,
+                turns: _h ? .125 : 0,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [AppColors.red, AppColors.blue], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(color: Colors.white24),
+                  ),
+                  alignment: Alignment.center,
+                  child: Transform.rotate(
+                    angle: _h ? -.785 : 0,
+                    child: Text('NC', style: AppText.display(15)),
+                  ),
                 ),
-                alignment: Alignment.center,
-                child: Transform.rotate(angle: _h ? -.785 : 0, child: Text('NC', style: AppText.display(15))),
               ),
-            ),
-            const SizedBox(width: 10),
-            Text('NIKHIL', style: AppText.display(22)),
-            Text(' CUTZ', style: AppText.display(22, color: AppColors.red)),
-          ]),
+              const SizedBox(width: 10),
+              Text('NIKHIL', style: AppText.display(22)),
+              Text(' CUTZ', style: AppText.display(22, color: AppColors.red)),
+            ],
+          ),
         ),
       ),
     );
@@ -378,24 +408,27 @@ class _NavLinkState extends State<_NavLink> {
           label: widget.label,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: AppText.body(14.5, color: on ? Colors.white : AppColors.textDim, weight: FontWeight.w700, height: 1.2),
-                child: Text(widget.label),
-              ),
-              const SizedBox(height: 5),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutCubic,
-                height: 2.5,
-                width: on ? 22 : 0,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [AppColors.red, AppColors.blue]),
-                  borderRadius: BorderRadius.circular(2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: AppText.body(14.5, color: on ? Colors.white : AppColors.textDim, weight: FontWeight.w700, height: 1.2),
+                  child: Text(widget.label),
                 ),
-              ),
-            ]),
+                const SizedBox(height: 5),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  height: 2.5,
+                  width: on ? 22 : 0,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [AppColors.red, AppColors.blue]),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -436,14 +469,20 @@ class _WhatsAppFabState extends State<_WhatsAppFab> with SingleTickerProviderSta
               label: 'Chat on WhatsApp',
               child: AnimatedBuilder(
                 animation: _c,
-                builder: (_, child) => Stack(alignment: Alignment.center, children: [
-                  Container(
-                    width: 58 + 26 * _c.value,
-                    height: 58 + 26 * _c.value,
-                    decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF25D366).withValues(alpha: .35 * (1 - _c.value))),
-                  ),
-                  child!,
-                ]),
+                builder: (_, child) => Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 58 + 26 * _c.value,
+                      height: 58 + 26 * _c.value,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF25D366).withValues(alpha: .35 * (1 - _c.value)),
+                      ),
+                    ),
+                    child!,
+                  ],
+                ),
                 child: AnimatedScale(
                   scale: _h ? 1.1 : 1,
                   duration: const Duration(milliseconds: 200),
@@ -453,7 +492,10 @@ class _WhatsAppFabState extends State<_WhatsAppFab> with SingleTickerProviderSta
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Color(0xFF1FAF55),
-                      boxShadow: [BoxShadow(color: AppColors.blue, offset: Offset(3, 3)), BoxShadow(color: Colors.black54, blurRadius: 16)],
+                      boxShadow: [
+                        BoxShadow(color: AppColors.blue, offset: Offset(3, 3)),
+                        BoxShadow(color: Colors.black54, blurRadius: 16),
+                      ],
                     ),
                     child: const Icon(Icons.chat_rounded, color: Colors.white, size: 28),
                   ),

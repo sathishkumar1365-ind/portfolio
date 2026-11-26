@@ -30,12 +30,27 @@ To preview it locally: `cd web_build && python3 -m http.server 8080` then open h
 
 ## Swap in real videos
 
-The site ships with short branded **placeholder** clips in `web/videos/`.
-Replace them with real, permission-cleared edits (compressed MP4, ideally under 8 MB each),
-keeping the same file names, or change the `videoUrl` values in `lib/content/site_content.dart`.
-Videos only load when a visitor hovers a card (muted preview, desktop) or presses play, so the homepage stays fast.
+Portfolio videos live in `lib/content/site_content.dart` (`projects`). Each `videoUrl` can be:
 
-Placeholder content to replace before launch: sample videos, the two case studies, and the "Photo coming soon" portrait in `lib/sections/about.dart`.
+- a **YouTube or YouTube Shorts link** (e.g. `https://www.youtube.com/shorts/VIDEO_ID`): the thumbnail is shown in the phone stack
+  and the video plays inside the phone with YouTube's own player when tapped, or
+- an **MP4** in `web/videos/` (e.g. `videos/my-edit.mp4`), which opens in the lightbox player.
+
+The current entries are **sample YouTube Shorts by other creators**, used only to demo the layout, and show a "SAMPLE" badge.
+Before launch, replace every link with Nikhil's own Shorts / Reels uploads and set `sample: false`.
+The showreel is still a branded placeholder clip at `web/videos/showreel.mp4`.
+
+### Phone stack carousel
+
+`lib/widgets/phone_stack.dart` is an original Flutter carousel: the centre card morphs into a phone (bezel, rounded
+screen, camera island) and plays in place, while the other videos fan out behind it, smaller and dimmer.
+It supports drag/swipe with fling, tapping a side card, arrow buttons, dots, keyboard arrows and auto-advance
+(which stops as soon as the visitor interacts).
+
+## Layout checks
+
+`flutter test test/overflow_test.dart` lays the whole page out at 13 screen sizes (320px phones to 1920px desktops)
+and fails on any overflow.
 
 ## Plug in the custom intro
 

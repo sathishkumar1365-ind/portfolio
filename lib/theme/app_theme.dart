@@ -16,10 +16,7 @@ class AppColors {
   static const textDim = Color(0xFFA1A1AA);
   static const textMute = Color(0xFF6B7080);
 
-  static const heroGradient = LinearGradient(
-    colors: [red, Color(0xFFB0127E), blue],
-    stops: [0, .5, 1],
-  );
+  static const heroGradient = LinearGradient(colors: [red, Color(0xFFB0127E), blue], stops: [0, .5, 1]);
 }
 
 class AppText {
@@ -60,11 +57,26 @@ ThemeData buildTheme() {
       floatingLabelStyle: AppText.body(14, color: AppColors.blueGlow, weight: FontWeight.w700),
       hintStyle: AppText.body(14, color: AppColors.textMute),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.blue, width: 1.6)),
-      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF5470))),
-      focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.red, width: 1.6)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.blue, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFFF5470)),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.red, width: 1.6),
+      ),
     ),
     scrollbarTheme: ScrollbarThemeData(
       thumbColor: WidgetStatePropertyAll(AppColors.red.withValues(alpha: .7)),
@@ -72,7 +84,11 @@ ThemeData buildTheme() {
       radius: const Radius.circular(6),
     ),
     tooltipTheme: TooltipThemeData(
-      decoration: BoxDecoration(color: AppColors.surfaceHi, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceHi,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
       textStyle: AppText.body(12, color: AppColors.text),
     ),
   );
