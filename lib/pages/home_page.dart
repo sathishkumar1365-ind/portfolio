@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -86,7 +84,10 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Widget _anchor(Sec s, Widget child) => KeyedSubtree(key: _keys[s], child: child);
+  Widget _anchor(Sec s, Widget child) => KeyedSubtree(
+    key: _keys[s],
+    child: OnScreen(child: child),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     children: [
                       _anchor(Sec.home, HeroSection(start: widget.introDone)),
-                      const ServiceMarquee(),
+                      const OnScreen(child: ServiceMarquee()),
                       _anchor(Sec.work, const Column(children: [ShowreelSection(), PortfolioSection(), CaseStudiesSection()])),
                       const SlashDivider(from: AppColors.bg, to: AppColors.bgAlt),
                       _anchor(Sec.services, const ServicesSection()),
@@ -117,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                       _anchor(Sec.pricing, const PricingSection()),
                       _anchor(Sec.faq, const FaqSection()),
                       _anchor(Sec.contact, const ContactSection()),
-                      const FooterSection(),
+                      const OnScreen(child: FooterSection()),
                     ],
                   ),
                 ),
@@ -148,12 +149,12 @@ class _NavBar extends StatelessWidget {
       right: 0,
       child: ValueListenableBuilder<bool>(
         valueListenable: scrolled,
-        builder: (context, isScrolled, _) => ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: isScrolled ? 14 : 0, sigmaY: isScrolled ? 14 : 0),
+        builder: (context, isScrolled, _) => RepaintBoundary(
+          // A live backdrop blur re-renders the page under the bar every scroll frame; a solid bar is much cheaper.
+          child: KeyedSubtree(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              color: isScrolled ? AppColors.bg.withValues(alpha: .78) : Colors.transparent,
+              color: isScrolled ? AppColors.bg.withValues(alpha: .94) : Colors.transparent,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

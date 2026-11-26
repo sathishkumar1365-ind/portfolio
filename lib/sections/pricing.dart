@@ -243,13 +243,15 @@ class _IntlQuote extends StatelessWidget {
             padding: EdgeInsets.all(mobile ? 26 : 44),
             child: Flex(
               direction: mobile ? Axis.vertical : Axis.horizontal,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: mobile ? CrossAxisAlignment.start : CrossAxisAlignment.center,
               children: [
                 const IconBadge(Icons.public_rounded, size: 64, redFirst: false),
                 SizedBox(width: mobile ? 0 : 28, height: mobile ? 20 : 0),
-                Flexible(
-                  fit: mobile ? FlexFit.loose : FlexFit.tight,
-                  child: Column(
+                // Flex children can't expand inside the page's vertical scroll, so only the wide row uses Expanded.
+                _expandIf(
+                  !mobile,
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('OUTSIDE INDIA?', style: AppText.label(12, color: AppColors.blueGlow)),
@@ -273,3 +275,5 @@ class _IntlQuote extends StatelessWidget {
     );
   }
 }
+
+Widget _expandIf(bool expand, Widget child) => expand ? Expanded(child: child) : child;

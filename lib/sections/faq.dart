@@ -78,15 +78,16 @@ class _FaqItemState extends State<_FaqItem> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
+              clipBehavior: Clip.antiAlias,
+              // Rounded borders must be one colour; the coloured accent is drawn as a foreground bar.
               decoration: BoxDecoration(
                 color: widget.open ? AppColors.surfaceHi : AppColors.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border(
-                  left: BorderSide(color: on ? c : AppColors.border, width: on ? 4 : 1),
-                  top: const BorderSide(color: AppColors.border),
-                  right: const BorderSide(color: AppColors.border),
-                  bottom: const BorderSide(color: AppColors.border),
-                ),
+                border: Border.all(color: AppColors.border),
+              ),
+              foregroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: LinearGradient(colors: [on ? c : Colors.transparent, Colors.transparent], stops: const [.006, .006]),
               ),
               padding: const EdgeInsets.fromLTRB(22, 20, 18, 20),
               child: Column(

@@ -123,15 +123,7 @@ const showreelUrl = 'videos/showreel.mp4';
 // SAMPLE videos: public YouTube Shorts by other creators, embedded with
 // YouTube's own player only to demo the layout. Replace every videoUrl with
 // Nikhil's own Shorts / Reels links before launch and set sample: false.
-const portfolioCategories = [
-  'All',
-  'Talking-Head',
-  'Podcast',
-  'UGC / Product Ads',
-  'Business Reels',
-  'YouTube / Long-Form',
-  'Motion Graphics',
-];
+const portfolioCategories = ['All', 'Talking-Head', 'Podcast', 'UGC / Product Ads', 'Business Reels', 'YouTube / Long-Form', 'Motion Graphics'];
 
 const projects = <Project>[
   Project(

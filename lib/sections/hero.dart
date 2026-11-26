@@ -117,7 +117,7 @@ class _HeroSectionState extends State<HeroSection> with TickerProviderStateMixin
                   animation: Listenable.merge([_enter, _pointer]),
                   builder: (_, _) => Transform.translate(
                     offset: Offset(_pointer.value.dx * 18, 40 * (1 - _seg(.1, .7))),
-                    child: CustomPaint(painter: _SkylinePainter()),
+                    child: RepaintBoundary(child: CustomPaint(painter: _SkylinePainter())),
                   ),
                 ),
               ),

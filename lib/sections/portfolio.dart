@@ -118,7 +118,10 @@ class _ShowreelPlayerState extends State<_ShowreelPlayer> {
                     // Film-strip edges
                     const Positioned(left: 0, right: 0, top: 0, height: 16, child: _Sprockets()),
                     const Positioned(left: 0, right: 0, bottom: 0, height: 16, child: _Sprockets()),
-                    Align(alignment: Alignment(0, context.isMobile ? -.45 : -.1), child: PlayBadge(size: context.isMobile ? 46 : 76, hot: _h)),
+                    Align(
+                      alignment: Alignment(0, context.isMobile ? -.45 : -.1),
+                      child: PlayBadge(size: context.isMobile ? 46 : 76, hot: _h),
+                    ),
                     Positioned(
                       left: 24,
                       bottom: 30,
@@ -132,7 +135,8 @@ class _ShowreelPlayerState extends State<_ShowreelPlayer> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text('SHOWREEL 2026', style: AppText.comic(context.isMobile ? 26 : 40)),
-                                if (!context.isMobile) Text('Nikhil Cutz · Video Editor & Creative Storyteller', style: AppText.body(13, color: Colors.white70)),
+                                if (!context.isMobile)
+                                  Text('Nikhil Cutz · Video Editor & Creative Storyteller', style: AppText.body(13, color: Colors.white70)),
                               ],
                             ),
                           ),

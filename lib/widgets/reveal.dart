@@ -107,3 +107,50 @@ class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
     );
   }
 }
+
+/// Pauses every animation inside [child] while it is off screen, so looping
+/// effects (webs, marquees, pulses) only cost frames when they can be seen.
+class OnScreen extends StatefulWidget {
+  const OnScreen({super.key, required this.child, this.margin = 200});
+  final Widget child;
+  final double margin;
+
+  @override
+  State<OnScreen> createState() => _OnScreenState();
+}
+
+class _OnScreenState extends State<OnScreen> {
+  ScrollController? _scroll;
+  bool _visible = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final s = ScrollScope.of(context);
+    if (s != _scroll) {
+      _scroll?.removeListener(_check);
+      _scroll = s;
+      _scroll?.addListener(_check);
+    }
+    SchedulerBinding.instance.addPostFrameCallback((_) => _check());
+  }
+
+  void _check() {
+    if (!mounted) return;
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize || !box.attached) return;
+    final top = box.localToGlobal(Offset.zero).dy;
+    final vh = MediaQuery.sizeOf(context).height;
+    final v = top < vh + widget.margin && top + box.size.height > -widget.margin;
+    if (v != _visible) setState(() => _visible = v);
+  }
+
+  @override
+  void dispose() {
+    _scroll?.removeListener(_check);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => TickerMode(enabled: _visible, child: widget.child);
+}

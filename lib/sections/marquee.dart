@@ -143,10 +143,13 @@ class _LooperState extends State<_Looper> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                KeyedSubtree(key: _key, child: widget.child),
-                widget.child,
-                widget.child,
-                widget.child,
+                KeyedSubtree(
+                  key: _key,
+                  child: RepaintBoundary(child: widget.child),
+                ),
+                RepaintBoundary(child: widget.child),
+                RepaintBoundary(child: widget.child),
+                RepaintBoundary(child: widget.child),
               ],
             ),
           ),

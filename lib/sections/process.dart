@@ -34,7 +34,7 @@ class _ScrollProgressState extends State<ScrollProgress> {
     final vh = MediaQuery.sizeOf(context).height;
     final top = box.localToGlobal(Offset.zero).dy;
     final p = ((vh * .7 - top) / box.size.height).clamp(0.0, 1.0);
-    if ((p - _p).abs() > .002) setState(() => _p = p);
+    if ((p - _p).abs() > .01 || (p != _p && (p == 0 || p == 1))) setState(() => _p = p);
   }
 
   @override
@@ -135,7 +135,7 @@ class _Step extends StatelessWidget {
     final c = i.isEven ? AppColors.red : AppColors.blue;
     final node = AnimatedContainer(
       duration: const Duration(milliseconds: 400),
-      curve: Curves.easeOutBack,
+      curve: Curves.easeOutCubic, // no overshoot: colours and shadows can't go past their end values
       width: 50,
       height: 50,
       decoration: BoxDecoration(

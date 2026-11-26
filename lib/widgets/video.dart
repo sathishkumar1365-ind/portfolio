@@ -345,26 +345,28 @@ class Poster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final redFirst = seed.isEven;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(-1 + (seed % 3) * .3, -1),
-              end: const Alignment(1, 1),
-              colors: redFirst
-                  ? const [Color(0xFF3A0A12), Color(0xFF0D0F1E), Color(0xFF0A1A4A)]
-                  : const [Color(0xFF0A1A4A), Color(0xFF0D0F1E), Color(0xFF3A0A12)],
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(-1 + (seed % 3) * .3, -1),
+                end: const Alignment(1, 1),
+                colors: redFirst
+                    ? const [Color(0xFF3A0A12), Color(0xFF0D0F1E), Color(0xFF0A1A4A)]
+                    : const [Color(0xFF0A1A4A), Color(0xFF0D0F1E), Color(0xFF3A0A12)],
+              ),
             ),
           ),
-        ),
-        CustomPaint(painter: HalftonePainter(color: redFirst ? AppColors.red : AppColors.blue, spacing: 12, maxDot: 2.4, opacity: .4)),
-        CustomPaint(
-          painter: WebPainter(progress: 1, sway: seed * .13, anchor: Offset(seed.isEven ? 1 : 0, 0), opacity: .16, spokes: 10, rings: 6, radiusFactor: .8),
-        ),
-        Center(child: Icon(icon, size: 64, color: Colors.white.withValues(alpha: .12))),
-      ],
+          CustomPaint(painter: HalftonePainter(color: redFirst ? AppColors.red : AppColors.blue, spacing: 12, maxDot: 2.4, opacity: .4)),
+          CustomPaint(
+            painter: WebPainter(progress: 1, sway: seed * .13, anchor: Offset(seed.isEven ? 1 : 0, 0), opacity: .16, spokes: 10, rings: 6, radiusFactor: .8),
+          ),
+          Center(child: Icon(icon, size: 64, color: Colors.white.withValues(alpha: .12))),
+        ],
+      ),
     );
   }
 }
